@@ -1,0 +1,48 @@
+---
+- name: Dev server provisioning
+  hosts: dev
+  become: yes
+
+  tasks:
+  -  name: Ensure necessary packages is present
+     apt:
+       update_cache: yes
+       name: "{{ packages }}"
+       state: present
+     vars:
+       packages:
+         - default-jdk
+         - maven
+         - git
+
+  - name: Ensure the git repository is cloned
+    git:
+      repo: 'https://github.com/boxfuse/boxfuse-sample-java-war-hello.git'
+      dest: /tmp/
+      clone: yes
+
+  - name: Ensure war file is ready
+    command: maven package -f /tmp/boxfuse-sample-java-war-hello/pom.xml
+
+  - name: Ensure war file on local host
+    fetch:
+      src: /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war
+      dest: /tmp/
+
+- name: Prod server provisioning
+  hosts: prod
+  become: yes
+
+  tasks:
+    - name: Ensure tomcat is present
+      apt:
+        update_cache: yes
+        name: tomcat9
+        state: present
+
+    - name: Ensure war file on prod server
+      copy:
+        src: /tmp/hello-1.0.war
+        dest: /var/lib/tomcat9/warapps/
+
+
