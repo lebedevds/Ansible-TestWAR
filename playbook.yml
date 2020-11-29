@@ -18,15 +18,15 @@
   - name: Ensure the git repository is cloned
     git:
       repo: 'https://github.com/boxfuse/boxfuse-sample-java-war-hello.git'
-      dest: /tmp/
+      dest: /tmp/WAR
       clone: yes
 
   - name: Ensure war file is ready
-    command: maven package -f /tmp/boxfuse-sample-java-war-hello/pom.xml
+    command: mvn package -f /tmp/WAR/pom.xml
 
   - name: Ensure war file on local host
     fetch:
-      src: /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war
+      src: /tmp/WAR/target/hello-1.0.war
       dest: /tmp/
 
 - name: Prod server provisioning
@@ -42,7 +42,7 @@
 
     - name: Ensure war file on prod server
       copy:
-        src: /tmp/hello-1.0.war
-        dest: /var/lib/tomcat9/warapps/
+        src: /tmp/dev1/tmp/WAR/target/hello-1.0.war
+        dest: /var/lib/tomcat9/webapps/hello-1.0.war
 
 
